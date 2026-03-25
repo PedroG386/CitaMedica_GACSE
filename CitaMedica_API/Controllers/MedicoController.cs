@@ -63,5 +63,20 @@ namespace CitaMedica_API.Controllers
         {
             await _repository.DeleteAsync(id);
         }
+
+        // POST api/medico/horario
+        [HttpPost("horario")]
+        public async Task PostHorario([FromBody] HorarioConsultaDto value)
+        {
+            var horario = new HorarioConsulta
+            {
+                MedicoId = value.MedicoId,
+                DiaSemana = (DiaSemana)value.DiaSemana,
+                HoraInicio = value.HoraInicio,
+                HoraFin = value.HoraFin,
+            };
+
+            await _repository.AddHorarioAsync(horario);
+        }
     }
 }

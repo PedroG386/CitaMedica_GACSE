@@ -1,17 +1,20 @@
 ﻿using CitaMedica_API.Data;
 using CitaMedica_API.Models;
-using CitaMedica_API.Models.Dtos;
+using CitaMedica_API.Models.Dtos.StoredProceduresResult;
 using Microsoft.EntityFrameworkCore;
+using CitaMedica_API.Utilities;
 
 namespace CitaMedica_API.Services
 {
     public class AgendaService : IAgendaService
     {
         private readonly CitaMedicaContext _context;
+        private readonly IHelpers _helpers;
 
-        public AgendaService(CitaMedicaContext context)
+        public AgendaService(CitaMedicaContext context, IHelpers helpers    )
         {
-           _context = context;
+            _context = context;
+            _helpers = helpers;
         }
 
         public async Task<IEnumerable<Cita>> CitasDelDiaAsync(int idMedico, DateTime fecha)
@@ -29,9 +32,19 @@ namespace CitaMedica_API.Services
             return await _context.Citas.Where(x => x.PacienteId==idPaciente).ToListAsync();
         }
 
-        public Task<IEnumerable<HorarioConsulta>> HorariosDisponiblesAsync(int idMedico, DateTime fecha)
+        public async Task<IEnumerable<HorarioDisponibleDto>> HorariosDisponiblesAsync(int idMedico, DateTime fecha)
         {
-            throw new NotImplementedException();
+           var dia = _helpers.ObtieneNumeroDia(fecha.DayOfWeek.ToString());
+
+           var horarios = await _context.Database
+                .SqlQuery<HorarioDisponibleDto>($@"
+                    EXEC dbo.HorariosDisponiblesMedico
+                            @IdMedico={idMedico},
+                            @Fecha={fecha.Date},
+                            @DiaSemana={dia}").ToListAsync();
+
+            return horarios;
+            
         }
     }
 }

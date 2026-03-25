@@ -30,6 +30,9 @@ namespace CitaMedica_API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<TimeSpan>("Duracion")
+                        .HasColumnType("time");
+
                     b.Property<int>("Estado")
                         .HasColumnType("int");
 
@@ -37,6 +40,9 @@ namespace CitaMedica_API.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<TimeSpan>("Hora")
+                        .HasColumnType("time");
+
+                    b.Property<TimeSpan>("HoraFin")
                         .HasColumnType("time");
 
                     b.Property<int>("MedicoId")

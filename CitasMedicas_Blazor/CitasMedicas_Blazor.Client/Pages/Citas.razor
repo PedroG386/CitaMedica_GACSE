@@ -1,0 +1,243 @@
+@page "/citas"
+@rendermode InteractiveWebAssembly
+@using CitasMedicas_Blazor.Client.Models
+@using CitasMedicas_Blazor.Client.Services
+@inject CitaService CitaService
+@inject MedicoService MedicoService
+@inject PacienteService PacienteService
+
+@if (mostrarToast)
+{
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+        <div class="toast show align-items-center text-white bg-@toastColor border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">@toastMensaje</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" @onclick="() => mostrarToast = false"></button>
+            </div>
+        </div>
+    </div>
+}
+
+<h3>Citas</h3>
+
+<button class="btn btn-primary mb-3 rounded-circle d-flex align-items-center justify-content-center" style="width:45px;height:45px;font-size:1.5rem;" title="Agendar Cita" @onclick="MostrarFormularioNuevo">+</button>
+
+@if (mostrarFormulario)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Agendar Cita</h5>
+            <div class="mb-2">
+                <label class="form-label">Medico</label>
+                <select class="form-select" @bind="citaActual.MedicoId">
+                    <option value="0">-- Seleccione un medico --</option>
+                    @if (medicos != null)
+                    {
+                        @foreach (var medico in medicos)
+                        {
+                            <option value="@medico.Id">@medico.Nombre - @medico.Especialidad</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Paciente</label>
+                <select class="form-select" @bind="citaActual.PacienteId">
+                    <option value="0">-- Seleccione un paciente --</option>
+                    @if (pacientes != null)
+                    {
+                        @foreach (var paciente in pacientes)
+                        {
+                            <option value="@paciente.Id">@paciente.Nombre</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Fecha</label>
+                <input type="date" class="form-control" @bind="citaActual.Fecha" min="@MinDate" />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Hora</label>
+                <input type="time" class="form-control" @bind="horaStr" />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Motivo</label>
+                <textarea class="form-control" rows="3" @bind="citaActual.Motivo"></textarea>
+            </div>
+            <button class="btn btn-success me-2" @onclick="AgendarAsync">Guardar</button>
+            <button class="btn btn-secondary" @onclick="CancelarFormulario">Cancelar</button>
+        </div>
+    </div>
+}
+
+
+@if (citaCancelando != null)
+{
+    <div class="card mb-3 border-danger">
+        <div class="card-body">
+            <h5 class="card-title text-danger">Cancelar Cita #@citaCancelando.Id</h5>
+            <div class="mb-2">
+                <label class="form-label">Motivo de cancelacion</label>
+                <textarea class="form-control" rows="2" @bind="motivoCancelacion"></textarea>
+            </div>
+            <button class="btn btn-danger me-2" @onclick="ConfirmarCancelacionAsync">Confirmar Cancelacion</button>
+            <button class="btn btn-secondary" @onclick="() => citaCancelando = null">Volver</button>
+        </div>
+    </div>
+}
+
+@if (citas == null)
+{
+    <p>Cargando...</p>
+}
+else if (!citas.Any())
+{
+    <p>No hay citas registradas.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Medico</th>
+                <th>Paciente</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Duracion</th>
+                <th>Hora Fin</th>
+                <th>Motivo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cita in citas)
+            {
+                <tr>
+                    <td>@cita.Id</td>
+                    <td>@(cita.Medico?.Nombre ?? "-")</td>
+                    <td>@(cita.Paciente?.Nombre ?? "-")</td>
+                    <td>@cita.Fecha.ToShortDateString()</td>
+                    <td>@cita.Hora.ToString(@"hh\:mm")</td>
+                    <td>@cita.Duracion.TotalMinutes min</td>
+                    <td>@cita.HoraFin.ToString(@"hh\:mm")</td>
+                    <td>@cita.Motivo</td>
+                    <td>
+                        @switch (cita.Estado)
+                        {
+                            case 1:
+                                <span class="badge bg-primary">Programada</span>
+                                break;
+                            case 2:
+                                <span class="badge bg-danger">Cancelada</span>
+                                break;
+                            case 3:
+                                <span class="badge bg-success">Completada</span>
+                                break;
+                        }
+                    </td>
+                    <td>
+                        @if (cita.Estado == 1)
+                        {
+                            <button class="btn btn-sm btn-danger" title="Cancelar Cita" @onclick="() => IniciarCancelacion(cita)">&#10060;</button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Cita>? citas;
+    private List<Medico>? medicos;
+    private List<Paciente>? pacientes;
+    private Cita citaActual = new() { Fecha = DateTime.Today };
+    private Cita? citaCancelando;
+    private bool mostrarFormulario = false;
+    private bool mostrarToast = false;
+    private string toastMensaje = string.Empty;
+    private string toastColor = "success";
+    private string motivoCancelacion = string.Empty;
+    private TimeOnly horaStr = new TimeOnly(8, 0);
+    private string MinDate => DateTime.Today.ToString("yyyy-MM-dd");
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.WhenAll(
+            CargarCitasAsync(),
+            CargarMedicosAsync(),
+            CargarPacientesAsync()
+        );
+    }
+
+    private async Task CargarCitasAsync()
+    {
+        citas = await CitaService.GetAllAsync();
+    }
+
+    private async Task CargarMedicosAsync()
+    {
+        medicos = await MedicoService.GetAllAsync();
+    }
+
+    private async Task CargarPacientesAsync()
+    {
+        pacientes = await PacienteService.GetAllAsync();
+    }
+
+    private void MostrarFormularioNuevo()
+    {
+        citaActual = new Cita { Fecha = DateTime.Today };
+        horaStr = new TimeOnly(8, 0);
+        mostrarFormulario = true;
+    }
+
+    private void CancelarFormulario()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task AgendarAsync()
+    {
+        citaActual.Hora = horaStr.ToTimeSpan();
+        var error = await CitaService.AgendarAsync(citaActual);
+        if (error != null)
+        {
+            MostrarToast(error, "danger");
+            return;
+        }
+        mostrarFormulario = false;
+        MostrarToast("Cita agendada exitosamente", "success");
+        await CargarCitasAsync();
+    }
+
+    private void IniciarCancelacion(Cita cita)
+    {
+        citaCancelando = cita;
+        motivoCancelacion = string.Empty;
+    }
+
+    private async Task ConfirmarCancelacionAsync()
+    {
+        if (citaCancelando == null) return;
+        await CitaService.CancelarAsync(citaCancelando.Id, motivoCancelacion);
+        citaCancelando = null;
+        motivoCancelacion = string.Empty;
+        MostrarToast("Cita cancelada", "danger");
+        await CargarCitasAsync();
+    }
+
+    private async void MostrarToast(string mensaje, string color)
+    {
+        toastMensaje = mensaje;
+        toastColor = color;
+        mostrarToast = true;
+        StateHasChanged();
+        await Task.Delay(3000);
+        mostrarToast = false;
+        StateHasChanged();
+    }
+}

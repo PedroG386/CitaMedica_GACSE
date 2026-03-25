@@ -14,6 +14,10 @@ public class Cita
 
     public TimeSpan Hora { get; set; }
 
+    public TimeSpan Duracion { get; set; }
+
+    public TimeSpan HoraFin { get; set; }
+
     [Required]
     [MaxLength(500)]
     public string Motivo { get; set; } = string.Empty;

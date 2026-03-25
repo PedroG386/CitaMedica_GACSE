@@ -31,7 +31,7 @@ namespace CitaMedica_API.Controllers
 
         // POST api/<CitaController>/agendar
         [HttpPost("agendar")]
-        public async Task Post([FromBody] AgendarCitaDto value)
+        public async Task<IActionResult> Post([FromBody] AgendarCitaDto value)
         {
             var cita = new Cita
             {
@@ -42,7 +42,11 @@ namespace CitaMedica_API.Controllers
                 Motivo = value.Motivo,
             };
 
-            await _repository.AgendarAsync(cita);
+            var error = await _repository.AgendarAsync(cita);
+            if (error != null)
+                return Conflict(error);
+
+            return Ok();
         }
 
         // PUT api/<CitaController>/cancelar/5

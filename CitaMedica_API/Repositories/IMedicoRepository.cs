@@ -9,4 +9,5 @@ public interface IMedicoRepository
     Task AddAsync(Medico medico);
     Task UpdateAsync(Medico medico);
     Task DeleteAsync(int id);
+    Task AddHorarioAsync(HorarioConsulta horario);
 }

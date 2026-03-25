@@ -31,18 +31,25 @@ namespace CitaMedica_API.Controllers
 
         // POST api/<PacienteController>
         [HttpPost]
-        public async Task Post([FromBody] PacienteDto value)
+        public async Task<IActionResult> Post([FromBody] PacienteDto value)
         {
-            var paciente = new Paciente
+            try
             {
-                Id = value.Id,
-                Nombre = value.Nombre,
-                FechaNacimiento = value.FechaNacimiento,
-                Telefono = value.Telefono,
-                CorreoElectronico = value.CorreoElectronico,
-            };
+                var paciente = new Paciente
+                {
+                    Nombre = value.Nombre,
+                    FechaNacimiento = value.FechaNacimiento,
+                    Telefono = value.Telefono,
+                    CorreoElectronico = value.CorreoElectronico,
+                };
 
-            await _repository.AddAsync(paciente);
+                await _repository.AddAsync(paciente);
+                return Ok();
+            }
+            catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+            {
+                return BadRequest("Ya existe un paciente con ese correo electronico.");
+            }
         }
 
         // PUT api/<PacienteController>/5
@@ -63,9 +70,17 @@ namespace CitaMedica_API.Controllers
 
         // DELETE api/<PacienteController>/5
         [HttpDelete("{id}")]
-        public async Task Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            await _repository.DeleteAsync(id);
+            try
+            {
+                await _repository.DeleteAsync(id);
+                return Ok();
+            }
+            catch (Microsoft.EntityFrameworkCore.DbUpdateException)
+            {
+                return BadRequest("No se puede eliminar el paciente porque tiene citas asociadas.");
+            }
         }
     }
 }

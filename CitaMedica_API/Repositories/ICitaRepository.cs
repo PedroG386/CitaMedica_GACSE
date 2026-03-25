@@ -6,6 +6,6 @@ public interface ICitaRepository
 {
     Task<IEnumerable<Cita>> GetAllAsync();
     Task<Cita?> GetByIdAsync(int id);
-    Task AgendarAsync(Cita cita);
+    Task<string?> AgendarAsync(Cita cita);
     Task CancelarAsync(int id, string motivoCancelacion);
 }

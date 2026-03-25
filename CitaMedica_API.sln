@@ -5,6 +5,30 @@ VisualStudioVersion = 17.14.36908.2 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitaMedica_API", "CitaMedica_API\CitaMedica_API.csproj", "{E4E76C07-34A9-40A6-935A-A97D991A62EE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitasMedicas_Blazor", "CitasMedicas_Blazor\CitasMedicas_Blazor\CitasMedicas_Blazor.csproj", "{6710BFEC-9458-4941-9B01-9D6A58CD459F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitasMedicas_Blazor.Client", "CitasMedicas_Blazor\CitasMedicas_Blazor.Client\CitasMedicas_Blazor.Client.csproj", "{AA852D94-81A7-4423-8973-B4F7DFC21523}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQL", "SQL", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StoredProcedures", "StoredProcedures", "{FD5D9008-FA24-4621-B501-A495C9F1C791}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\Downloads\ValidaProgramacionMedico.sql = ..\..\..\Downloads\ValidaProgramacionMedico.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tables", "Tables", "{950066F2-756A-4A37-AA9A-F30890935417}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\Downloads\Tabla_citas.sql = ..\..\..\Downloads\Tabla_citas.sql
+		..\..\..\Downloads\Tabla_HorariosMedico.sql = ..\..\..\Downloads\Tabla_HorariosMedico.sql
+		..\..\..\Downloads\Tabla_medicos.sql = ..\..\..\Downloads\Tabla_medicos.sql
+		..\..\..\Downloads\Tabla_pacientes.sql = ..\..\..\Downloads\Tabla_pacientes.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataBase", "DataBase", "{15370117-7FBF-4C07-A054-2265EDA2CDE2}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\Downloads\Create_DatabaseCitaMedica.sql = ..\..\..\Downloads\Create_DatabaseCitaMedica.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +39,22 @@ Global
 		{E4E76C07-34A9-40A6-935A-A97D991A62EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4E76C07-34A9-40A6-935A-A97D991A62EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4E76C07-34A9-40A6-935A-A97D991A62EE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6710BFEC-9458-4941-9B01-9D6A58CD459F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6710BFEC-9458-4941-9B01-9D6A58CD459F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6710BFEC-9458-4941-9B01-9D6A58CD459F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6710BFEC-9458-4941-9B01-9D6A58CD459F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA852D94-81A7-4423-8973-B4F7DFC21523}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA852D94-81A7-4423-8973-B4F7DFC21523}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA852D94-81A7-4423-8973-B4F7DFC21523}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA852D94-81A7-4423-8973-B4F7DFC21523}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FD5D9008-FA24-4621-B501-A495C9F1C791} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{950066F2-756A-4A37-AA9A-F30890935417} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{15370117-7FBF-4C07-A054-2265EDA2CDE2} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7576D02F-E9CB-4A8D-AFDC-C06011A9FDC0}

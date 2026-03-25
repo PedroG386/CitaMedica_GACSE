@@ -1,0 +1,212 @@
+@page "/medicos"
+@rendermode InteractiveWebAssembly
+@using CitasMedicas_Blazor.Client.Models
+@using CitasMedicas_Blazor.Client.Services
+@inject MedicoService MedicoService
+
+@if (mostrarToast)
+{
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+        <div class="toast show align-items-center text-white bg-@toastColor border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">@toastMensaje</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" @onclick="() => mostrarToast = false"></button>
+            </div>
+        </div>
+    </div>
+}
+
+<h3>Medicos</h3>
+
+<button class="btn btn-primary mb-3 rounded-circle d-flex align-items-center justify-content-center" style="width:45px;height:45px;font-size:1.5rem;" title="Nuevo Medico" @onclick="MostrarFormularioNuevo">+</button>
+
+@* Formularios para crear,editar medico y agregaro un nuevo horario *@
+
+@if (mostrarFormulario)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">@(medicoActual.Id == 0 ? "Nuevo Medico" : "Editar Medico")</h5>
+            <div class="mb-2">
+                <label class="form-label">Nombre</label>
+                <input class="form-control" @bind="medicoActual.Nombre" />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Especialidad</label>
+                <input class="form-control" @bind="medicoActual.Especialidad" />
+            </div>
+            <button class="btn btn-success me-2" @onclick="GuardarAsync">Guardar</button>
+            <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+        </div>
+    </div>
+}
+
+@if (mostrarFormularioHorario)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Agregar Horario</h5>
+            <div class="mb-2">
+                <label class="form-label">Dia de la Semana</label>
+                <select class="form-select" @bind="horarioActual.DiaSemana">
+                    <option value="1">Lunes</option>
+                    <option value="2">Martes</option>
+                    <option value="3">Miercoles</option>
+                    <option value="4">Jueves</option>
+                    <option value="5">Viernes</option>
+                    <option value="6">Sabado</option>
+                    <option value="7">Domingo</option>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Hora Inicio</label>
+                <input type="time" class="form-control" @bind="horaInicioStr" />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Hora Fin</label>
+                <input type="time" class="form-control" @bind="horaFinStr" />
+            </div>
+            <button class="btn btn-success me-2" @onclick="GuardarHorarioAsync">Guardar</button>
+            <button class="btn btn-secondary" @onclick="CancelarHorario">Cancelar</button>
+        </div>
+    </div>
+}
+
+@if (medicos == null)
+{
+    <p>Cargando...</p>
+}
+else if (!medicos.Any())
+{
+    <p>No hay medicos registrados.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Especialidad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var medico in medicos)
+            {
+                <tr>
+                    <td>@medico.Id</td>
+                    <td>@medico.Nombre</td>
+                    <td>@medico.Especialidad</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning me-1" title="Editar" @onclick="() => Editar(medico)">&#9998;</button>
+                        <button class="btn btn-sm btn-info me-1" title="Agregar Horario" @onclick="() => MostrarFormularioHorario(medico.Id)">&#128197;</button>
+                        <button class="btn btn-sm btn-danger" title="Eliminar" @onclick="() => EliminarAsync(medico.Id)">&#128465;</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Medico>? medicos;
+    private Medico medicoActual = new();
+    private HorarioConsulta horarioActual = new();
+    private bool mostrarFormulario = false;
+    private bool mostrarFormularioHorario = false;
+    private bool mostrarToast = false;
+    private string toastMensaje = string.Empty;
+    private string toastColor = "success";
+    private TimeOnly horaInicioStr = new TimeOnly(8, 0);
+    private TimeOnly horaFinStr = new TimeOnly(14, 0);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarMedicosAsync();
+    }
+
+    private async Task CargarMedicosAsync()
+    {
+        medicos = await MedicoService.GetAllAsync();
+    }
+
+    private void MostrarFormularioNuevo()
+    {
+        medicoActual = new Medico();
+        mostrarFormulario = true;
+    }
+
+    private void Editar(Medico medico)
+    {
+        medicoActual = new Medico
+        {
+            Id = medico.Id,
+            Nombre = medico.Nombre,
+            Especialidad = medico.Especialidad
+        };
+        mostrarFormulario = true;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task GuardarAsync()
+    {
+        if (medicoActual.Id == 0)
+        {
+            await MedicoService.CreateAsync(medicoActual);
+            MostrarToast("Medico creado exitosamente", "success");
+        }
+        else
+        {
+            await MedicoService.UpdateAsync(medicoActual.Id, medicoActual);
+            MostrarToast("Medico actualizado exitosamente", "info");
+        }
+
+        mostrarFormulario = false;
+        await CargarMedicosAsync();
+    }
+
+    private async Task EliminarAsync(int id)
+    {
+        await MedicoService.DeleteAsync(id);
+        MostrarToast("Medico eliminado exitosamente", "danger");
+        await CargarMedicosAsync();
+    }
+
+    private void MostrarFormularioHorario(int medicoId)
+    {
+        horarioActual = new HorarioConsulta { MedicoId = medicoId, DiaSemana = 1 };
+        horaInicioStr = new TimeOnly(8, 0);
+        horaFinStr = new TimeOnly(14, 0);
+        mostrarFormularioHorario = true;
+    }
+
+    private void CancelarHorario()
+    {
+        mostrarFormularioHorario = false;
+    }
+
+    private async Task GuardarHorarioAsync()
+    {
+        horarioActual.HoraInicio = horaInicioStr.ToTimeSpan();
+        horarioActual.HoraFin = horaFinStr.ToTimeSpan();
+        await MedicoService.AddHorarioAsync(horarioActual);
+        mostrarFormularioHorario = false;
+        MostrarToast("Horario agregado exitosamente", "success");
+    }
+
+    private async void MostrarToast(string mensaje, string color)
+    {
+        toastMensaje = mensaje;
+        toastColor = color;
+        mostrarToast = true;
+        StateHasChanged();
+        await Task.Delay(3000);
+        mostrarToast = false;
+        StateHasChanged();
+    }
+}

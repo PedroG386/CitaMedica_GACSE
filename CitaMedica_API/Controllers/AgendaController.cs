@@ -1,5 +1,6 @@
 ﻿using CitaMedica_API.Models;
 using CitaMedica_API.Models.Dtos;
+using CitaMedica_API.Models.Dtos.StoredProceduresResult;
 using CitaMedica_API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,15 +26,17 @@ namespace CitaMedica_API.Controllers
         }
 
         // PUT api/<ValuesController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpGet("historialcitas/{id}")]
+        public async Task<IEnumerable<Cita>> Get(int id)
         {
+            return await _agendaService.HistorialCitasAsync(id);
         }
 
-        // DELETE api/<ValuesController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpPost("horariosdisponibles")]
+        public async Task<IEnumerable<HorarioDisponibleDto>> Put([FromBody] AgendaDelDiaRequestDto value)
         {
+            return await _agendaService.HorariosDisponiblesAsync(value.IdMedico, value.Fecha);
         }
+
     }
 }

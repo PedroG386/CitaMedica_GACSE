@@ -1,0 +1,173 @@
+@page "/pacientes"
+@rendermode InteractiveWebAssembly
+@using CitasMedicas_Blazor.Client.Models
+@using CitasMedicas_Blazor.Client.Services
+@inject PacienteService PacienteService
+
+@if (mostrarToast)
+{
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1050;">
+        <div class="toast show align-items-center text-white bg-@toastColor border-0" role="alert">
+            <div class="d-flex">
+                <div class="toast-body">@toastMensaje</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" @onclick="() => mostrarToast = false"></button>
+            </div>
+        </div>
+    </div>
+}
+
+<h3>Pacientes</h3>
+
+<button class="btn btn-primary mb-3 rounded-circle d-flex align-items-center justify-content-center" style="width:45px;height:45px;font-size:1.5rem;" title="Nuevo Paciente" @onclick="MostrarFormularioNuevo">+</button>
+
+@if (mostrarFormulario)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">@(pacienteActual.Id == 0 ? "Nuevo Paciente" : "Editar Paciente")</h5>
+            <div class="mb-2">
+                <label class="form-label">Nombre</label>
+                <input class="form-control" @bind="pacienteActual.Nombre" />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Fecha de Nacimiento</label>
+                <input type="date" class="form-control" @bind="pacienteActual.FechaNacimiento" />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Telefono</label>
+                <input class="form-control" @bind="pacienteActual.Telefono" />
+            </div>
+            <div class="mb-2">
+                <label class="form-label">Correo Electronico</label>
+                <input type="email" class="form-control" @bind="pacienteActual.CorreoElectronico" />
+            </div>
+            <button class="btn btn-success me-2" @onclick="GuardarAsync">Guardar</button>
+            <button class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+        </div>
+    </div>
+}
+
+@if (pacientes == null)
+{
+    <p>Cargando...</p>
+}
+else if (!pacientes.Any())
+{
+    <p>No hay pacientes registrados.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nombre</th>
+                <th>Fecha Nacimiento</th>
+                <th>Telefono</th>
+                <th>Correo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var paciente in pacientes)
+            {
+                <tr>
+                    <td>@paciente.Id</td>
+                    <td>@paciente.Nombre</td>
+                    <td>@paciente.FechaNacimiento.ToString("dd/MM/yyyy")</td>
+                    <td>@paciente.Telefono</td>
+                    <td>@paciente.CorreoElectronico</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning me-1" title="Editar" @onclick="() => Editar(paciente)">&#9998;</button>
+                        <button class="btn btn-sm btn-danger" title="Eliminar" @onclick="() => EliminarAsync(paciente.Id)">&#128465;</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Paciente>? pacientes;
+    private Paciente pacienteActual = new();
+    private bool mostrarFormulario = false;
+    private bool mostrarToast = false;
+    private string toastMensaje = string.Empty;
+    private string toastColor = "success";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarPacientesAsync();
+    }
+
+    private async Task CargarPacientesAsync()
+    {
+        pacientes = await PacienteService.GetAllAsync();
+    }
+
+    private void MostrarFormularioNuevo()
+    {
+        pacienteActual = new Paciente();
+        mostrarFormulario = true;
+    }
+
+    private void Editar(Paciente paciente)
+    {
+        pacienteActual = new Paciente
+        {
+            Id = paciente.Id,
+            Nombre = paciente.Nombre,
+            FechaNacimiento = paciente.FechaNacimiento,
+            Telefono = paciente.Telefono,
+            CorreoElectronico = paciente.CorreoElectronico
+        };
+        mostrarFormulario = true;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task GuardarAsync()
+    {
+        if (pacienteActual.Id == 0)
+        {
+            await PacienteService.CreateAsync(pacienteActual);
+            MostrarToast("Paciente creado exitosamente", "success");
+        }
+        else
+        {
+            await PacienteService.UpdateAsync(pacienteActual.Id, pacienteActual);
+            MostrarToast("Paciente actualizado exitosamente", "info");
+        }
+
+        mostrarFormulario = false;
+        await CargarPacientesAsync();
+    }
+
+    private async Task EliminarAsync(int id)
+    {
+        var error = await PacienteService.DeleteAsync(id);
+        if (error != null)
+        {
+            MostrarToast(error, "warning");
+        }
+        else
+        {
+            MostrarToast("Paciente eliminado exitosamente", "danger");
+            await CargarPacientesAsync();
+        }
+    }
+
+    private async void MostrarToast(string mensaje, string color)
+    {
+        toastMensaje = mensaje;
+        toastColor = color;
+        mostrarToast = true;
+        StateHasChanged();
+        await Task.Delay(3000);
+        mostrarToast = false;
+        StateHasChanged();
+    }
+}

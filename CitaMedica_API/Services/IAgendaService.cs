@@ -1,5 +1,6 @@
 using CitaMedica_API.Models;
 using CitaMedica_API.Models.Dtos;
+using CitaMedica_API.Models.Dtos.StoredProceduresResult;
 
 namespace CitaMedica_API.Services
 {
@@ -7,7 +8,7 @@ namespace CitaMedica_API.Services
     {
         Task<IEnumerable<Cita>> CitasDelDiaAsync(int idMedico, DateTime fecha);
         Task<IEnumerable<Cita>> HistorialCitasAsync(int idPaciente);
-        Task<IEnumerable<HorarioConsulta>> HorariosDisponiblesAsync(int idMedico, DateTime fecha);
+        Task<IEnumerable<HorarioDisponibleDto>> HorariosDisponiblesAsync(int idMedico, DateTime fecha);
     }
 }
 

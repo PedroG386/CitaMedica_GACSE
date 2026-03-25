@@ -48,4 +48,10 @@ public class MedicoRepository : IMedicoRepository
             await _context.SaveChangesAsync();
         }
     }
+
+    public async Task AddHorarioAsync(HorarioConsulta horario)
+    {
+        _context.HorariosConsulta.Add(horario);
+        await _context.SaveChangesAsync();
+    }
 }
