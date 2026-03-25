@@ -1,0 +1,39 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=CitaMedica2026!
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+
+  api:
+    build:
+      context: .
+      dockerfile: CitaMedica_API/Dockerfile
+    ports:
+      - "7158:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__CitaMedicaDB=Server=sqlserver;Database=CitaMedicaDB;User Id=sa;Password=CitaMedica2026!;TrustServerCertificate=True
+      - ASPNETCORE_URLS=http://+:8080
+    depends_on:
+      - sqlserver
+
+  blazor:
+    build:
+      context: .
+      dockerfile: CitasMedicas_Blazor/Dockerfile
+    ports:
+      - "7005:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ApiBaseUrl=http://api:8080
+      - ASPNETCORE_URLS=http://+:8080
+    depends_on:
+      - api
+
+volumes:
+  sqlserver_data:
