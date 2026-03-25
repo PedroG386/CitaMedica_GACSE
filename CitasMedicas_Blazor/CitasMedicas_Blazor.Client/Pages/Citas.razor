@@ -204,15 +204,12 @@ else
         pacientes = await PacienteService.GetAllAsync();
     }
 
-    private async Task CargaHistorialCitasPacienete()
+    private async Task<int> CargaHistorialCitasPacienete()
     {
         citasPaciente = await AgendaService.HistorialCitasAsync(citaActual.PacienteId);
         var canceladasTreintaDias = citasPaciente.Where(c => c.Estado == 2 && c.Fecha >= DateTime.Today.AddDays(-30)).ToList();
-        if (canceladasTreintaDias.Count >= 3)
-        {
-            MostrarToast("El paciente ha cancelado 3 o más citas en los últimos 30 días", "danger");
-            return;
-        }
+        return canceladasTreintaDias.Count;
+
 
     }
 
@@ -236,9 +233,14 @@ else
 
     private async Task AgendarAsync()
     {
-       await  CargaHistorialCitasPacienete();
+        var numeroCanceladas = await  CargaHistorialCitasPacienete();
 
         citaActual.Hora = horaStr.ToTimeSpan();
+        if (numeroCanceladas >= 5)
+        {
+            MostrarToast("No se puede agendar cita, pro que el paciente tiene 5 o mas cancelaciones", "danger");
+            return;
+        }
         var error = await CitaService.AgendarAsync(citaActual);
         if (error != null)
         {

@@ -70,6 +70,7 @@ public class CitaRepository : ICitaRepository
             "cirugia" or "cirugía" => TimeSpan.FromMinutes(45),
             "pediatria" or "pediatría" => TimeSpan.FromMinutes(20),
             "ginecologia" or "ginecología" => TimeSpan.FromMinutes(30),
+            "traumatologia" or "traumatología" => TimeSpan.FromMinutes(35),
             _ => TimeSpan.FromMinutes(30)
         };
 
