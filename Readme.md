@@ -1,6 +1,8 @@
 # CitaMedica API
 
 **DEV:** Pedro Gamiño
+**Fecha:** 26 de marzo de 2026
+
 
 ---
 
