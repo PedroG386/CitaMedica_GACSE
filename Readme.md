@@ -1,5 +1,9 @@
 # CitaMedica API
 
+**DEV:** Pedro Gamiño
+
+---
+
 ## Instrucciones para ejecutar el proyecto
 
 ### 1. Base de datos
