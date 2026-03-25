@@ -9,10 +9,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitasMedicas_Blazor", "Cita
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CitasMedicas_Blazor.Client", "CitasMedicas_Blazor\CitasMedicas_Blazor.Client\CitasMedicas_Blazor.Client.csproj", "{AA852D94-81A7-4423-8973-B4F7DFC21523}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQL", "SQL", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CitaMedica_SQL", "CitaMedica_SQL", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StoredProcedures", "StoredProcedures", "{FD5D9008-FA24-4621-B501-A495C9F1C791}"
 	ProjectSection(SolutionItems) = preProject
+		..\..\..\Downloads\SP_HorariosDisponiblesMedico.sql = ..\..\..\Downloads\SP_HorariosDisponiblesMedico.sql
 		..\..\..\Downloads\ValidaProgramacionMedico.sql = ..\..\..\Downloads\ValidaProgramacionMedico.sql
 	EndProjectSection
 EndProject
@@ -28,6 +29,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataBase", "DataBase", "{15
 	ProjectSection(SolutionItems) = preProject
 		..\..\..\Downloads\Create_DatabaseCitaMedica.sql = ..\..\..\Downloads\Create_DatabaseCitaMedica.sql
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CitaMedica_ApiNetCore", "CitaMedica_ApiNetCore", "{26458E2F-1128-4C69-BCF1-90334F9ECD15}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CitaMedica_FrontendBlazor", "CitaMedica_FrontendBlazor", "{3EC73971-2499-4933-A5A1-41B080C4A29C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,6 +57,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{E4E76C07-34A9-40A6-935A-A97D991A62EE} = {26458E2F-1128-4C69-BCF1-90334F9ECD15}
+		{6710BFEC-9458-4941-9B01-9D6A58CD459F} = {3EC73971-2499-4933-A5A1-41B080C4A29C}
+		{AA852D94-81A7-4423-8973-B4F7DFC21523} = {3EC73971-2499-4933-A5A1-41B080C4A29C}
 		{FD5D9008-FA24-4621-B501-A495C9F1C791} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{950066F2-756A-4A37-AA9A-F30890935417} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{15370117-7FBF-4C07-A054-2265EDA2CDE2} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}

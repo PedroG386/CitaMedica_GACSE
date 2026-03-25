@@ -1,10 +1,12 @@
 @page "/citas"
 @rendermode InteractiveWebAssembly
+@using CitaMedica_API.Models.Dtos.StoredProceduresResult
 @using CitasMedicas_Blazor.Client.Models
 @using CitasMedicas_Blazor.Client.Services
 @inject CitaService CitaService
 @inject MedicoService MedicoService
 @inject PacienteService PacienteService
+@inject AgendaService AgendaService
 
 @if (mostrarToast)
 {
@@ -29,7 +31,7 @@
             <h5 class="card-title">Agendar Cita</h5>
             <div class="mb-2">
                 <label class="form-label">Medico</label>
-                <select class="form-select" @bind="citaActual.MedicoId">
+                <select class="form-select" @bind="citaActual.MedicoId" >
                     <option value="0">-- Seleccione un medico --</option>
                     @if (medicos != null)
                     {
@@ -64,6 +66,18 @@
             <div class="mb-2">
                 <label class="form-label">Motivo</label>
                 <textarea class="form-control" rows="3" @bind="citaActual.Motivo"></textarea>
+            </div>
+            <div class="mb-2">
+                <h6 class="card-title">Sugerencia de Horarios del Medico</h6>
+                @if (horariosDisponibles != null)
+                {
+                    <ul class="list-group list-group-horizontal">
+                        @foreach(var horario in horariosDisponibles)
+                        {
+                            <li class="list-group-item">@horario.HorarioDisponible</li>
+                        }
+                    </ul>
+                }
             </div>
             <button class="btn btn-success me-2" @onclick="AgendarAsync">Guardar</button>
             <button class="btn btn-secondary" @onclick="CancelarFormulario">Cancelar</button>
@@ -152,8 +166,10 @@ else
 
 @code {
     private List<Cita>? citas;
+    private List<Cita>? citasPaciente;
     private List<Medico>? medicos;
     private List<Paciente>? pacientes;
+    private List<HorarioDisponibleDto>? horariosDisponibles;
     private Cita citaActual = new() { Fecha = DateTime.Today };
     private Cita? citaCancelando;
     private bool mostrarFormulario = false;
@@ -188,6 +204,24 @@ else
         pacientes = await PacienteService.GetAllAsync();
     }
 
+    private async Task CargaHistorialCitasPacienete()
+    {
+        citasPaciente = await AgendaService.HistorialCitasAsync(citaActual.PacienteId);
+        var canceladasTreintaDias = citasPaciente.Where(c => c.Estado == 2 && c.Fecha >= DateTime.Today.AddDays(-30)).ToList();
+        if (canceladasTreintaDias.Count >= 3)
+        {
+            MostrarToast("El paciente ha cancelado 3 o más citas en los últimos 30 días", "danger");
+            return;
+        }
+
+    }
+
+
+    private async Task CargarHorariosDisponiblesAsync()
+    {
+        horariosDisponibles = await AgendaService.HorariosDisponiblesMedicos(citaActual.MedicoId, citaActual.Fecha);
+    }
+
     private void MostrarFormularioNuevo()
     {
         citaActual = new Cita { Fecha = DateTime.Today };
@@ -202,11 +236,14 @@ else
 
     private async Task AgendarAsync()
     {
+       await  CargaHistorialCitasPacienete();
+
         citaActual.Hora = horaStr.ToTimeSpan();
         var error = await CitaService.AgendarAsync(citaActual);
         if (error != null)
         {
             MostrarToast(error, "danger");
+            await CargarHorariosDisponiblesAsync();
             return;
         }
         mostrarFormulario = false;
