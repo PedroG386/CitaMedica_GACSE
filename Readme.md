@@ -66,3 +66,15 @@
 - `/medicos` - CRUD de medicos y asignacion de horarios de consulta
 - `/pacientes` - CRUD de pacientes
 - `/citas` - Agendar y cancelar citas medicas
+
+### 4. Pruebas unitarias
+
+El proyecto `CitaMedica_API.Tests` contiene pruebas sobre el repositorio de citas usando xUnit y EF Core InMemory.
+
+Para ejecutarlas:
+
+
+Pruebas incluidas:
+- Agendar una cita dentro del horario del medico (caso exitoso)
+- Agendar una cita fuera del horario del medico (validacion de error)
+- Cancelar una cita existente (cambio de estado y motivo)
