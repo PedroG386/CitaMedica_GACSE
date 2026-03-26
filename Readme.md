@@ -2,7 +2,7 @@
 
 **DEV:** Pedro Gamiño
 
-**Fecha:** 26 de marzo de 2026
+**Fecha:** 25 de marzo de 2026
 
 
 ---
